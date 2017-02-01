@@ -42,6 +42,18 @@ public class ArrayList {
 		// size++;
 	}
 
+	public void insert(int index, String value) {
+		if (index < 0 || index > size)
+			throw new ArrayIndexOutOfBoundsException(index);
+		
+		size++;
+		checkSpace();
+		
+		if (index < size - 1)
+			System.arraycopy(array, index, array, index + 1, size);
+		array[index] = value;
+	}
+
 	public int size() {
 		return size;
 	}
@@ -49,7 +61,6 @@ public class ArrayList {
 	private void checkSpace() {
 		if (hasSpace())
 			return;
-
 		increaseSpace();
 	}
 
@@ -75,8 +86,9 @@ public class ArrayList {
 	}
 
 	public String set(int index, String value) {
-		if (index < 0 || index > size)
+		if (index < 0 || index >= size)
 			throw new ArrayIndexOutOfBoundsException(index);
+
 		String oldValue = array[index];
 		array[index] = value;
 		return oldValue;
@@ -87,7 +99,7 @@ public class ArrayList {
 	}
 
 	public String get(int index) {
-		if (index < 0 || index > size)
+		if (index < 0 || index >= size)
 			throw new ArrayIndexOutOfBoundsException(index);
 		return array[index];
 	}
@@ -143,16 +155,17 @@ public class ArrayList {
 	// OK - ler alguma posicao
 	// OK - retornar o primeiro indice de um valor na lista
 	// OK - retornar o ultimo indice de um valor na lista
-
-	// adicionar no meio
+	// OK - adicionar em qualquer posição
+	
+	// retornar o primeiro indice de um valor na lista a partir de um indice
+	
 	// adicionar mais de um elemento no final
 	// adicionar mais de um elemento em qualquer posicao
 	// retirar de uma posicao
-
+	// Habilitar foreach
+	
 	// ordenar a lista maior > menor
 	// ordenar a lista menor > maior
 	// procurar valor na lista
-
-	// retornar o primeiro indice de um valor na lista a partir de um indice
 	//
 }

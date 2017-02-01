@@ -110,11 +110,25 @@ public class ArrayListTest {
 	}
 
 	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void when_update_index_out_of_bound_equal_size() {
+		ArrayList list = new ArrayList(0);
+
+		list.set(list.size(), "test");
+	}
+	
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
 	public void when_update_index_out_of_bound_with_default_constructor() {
 		ArrayList list = new ArrayList();
 
 		list.set(1, "test");
 	}
+	
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void when_update_index_out_of_bound_equal_size_with_default_constructor() {
+		ArrayList list = new ArrayList();
+		list.add("a");
+		list.set(list.size(), "test");
+	}	
 
 	@Test
 	public void confirm_the_empty_result() {
@@ -134,7 +148,6 @@ public class ArrayListTest {
 		list.add("test");
 
 		assertEquals("test", list.get(0));
-
 	}
 
 	@Test(expected = ArrayIndexOutOfBoundsException.class)
@@ -142,8 +155,15 @@ public class ArrayListTest {
 		ArrayList list = new ArrayList();
 
 		list.add("test");
-
 		list.get(2);
+	}
+
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void when_tries_to_get_index_out_the_bounds_equal_size() {
+		ArrayList list = new ArrayList();
+
+		list.add("test");
+		list.get(list.size());
 	}
 
 	@Test
@@ -263,4 +283,84 @@ public class ArrayListTest {
 		assertEquals(1, list.lastIndexOf(new String(new char[] { 'b' })));
 	}
 
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void insert_value_out_of_bound_equal_size_plus_one() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+
+		list.insert(list.size() + 1, "c");
+	}
+
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void insert_value_out_of_bound_greater_than_size() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+
+		list.insert(5, "c");
+	}
+
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void insert_value_out_of_bound_lower_than_size() {
+		ArrayList list = new ArrayList();
+		list.insert(-1, "c");
+	}
+
+	@Test
+	public void insert_value_in_the_beginning() {
+		ArrayList list = new ArrayList();
+		list.add("b");
+		list.insert(0, "a");
+
+		assertEquals("a", list.get(0));
+		assertEquals("b", list.get(1));
+	}
+
+	@Test
+	public void insert_value_in_the_middle() {
+		ArrayList list = new ArrayList();
+		list.add("a");
+		list.add("c");
+		list.insert(1, "b");
+
+		assertEquals("a", list.get(0));
+		assertEquals("b", list.get(1));
+		assertEquals("c", list.get(2));
+	}
+
+	@Test
+	public void insert_value_in_the_end() {
+		ArrayList list = new ArrayList();
+		list.add("a");
+		list.add("b");
+		list.insert(list.size(), "c");
+
+		assertEquals("a", list.get(0));
+		assertEquals("b", list.get(1));
+		assertEquals("c", list.get(2));
+	}
+	
+	@Test
+	public void when_adds_10_million_and_insert_into_position_0() {
+		ArrayList list = new ArrayList(5);
+		for (int i = 0; i < 10_000_000; i++)
+			list.add(String.valueOf(i));
+		list.insert(0, "a");
+		
+		assertEquals("a", list.get(0));
+		assertEquals("9999999", list.get(10_000_000));
+	}	
+	
+	@Test
+	public void when_insert_1_000_at_beginning() {
+		ArrayList list = new ArrayList(5);
+		for (int i = 0; i < 1_000; i++)
+			list.insert(0, String.valueOf(i));
+		
+		assertEquals("999", list.get(0));
+		assertEquals("0", list.get(999));
+	}	
 }
