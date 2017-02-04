@@ -115,20 +115,20 @@ public class ArrayListTest {
 
 		list.set(list.size(), "test");
 	}
-	
+
 	@Test(expected = ArrayIndexOutOfBoundsException.class)
 	public void when_update_index_out_of_bound_with_default_constructor() {
 		ArrayList list = new ArrayList();
 
 		list.set(1, "test");
 	}
-	
+
 	@Test(expected = ArrayIndexOutOfBoundsException.class)
 	public void when_update_index_out_of_bound_equal_size_with_default_constructor() {
 		ArrayList list = new ArrayList();
 		list.add("a");
 		list.set(list.size(), "test");
-	}	
+	}
 
 	@Test
 	public void confirm_the_empty_result() {
@@ -165,6 +165,8 @@ public class ArrayListTest {
 		list.add("test");
 		list.get(list.size());
 	}
+
+	// indexof any from beggining
 
 	@Test
 	public void return_index_0_when_a_first_position() {
@@ -222,6 +224,122 @@ public class ArrayListTest {
 		list.add("a");
 
 		assertEquals(2, list.indexOf(new String(new char[] { 'b' })));
+	}
+
+	// indexof any middle
+
+	@Test
+	public void return_index_2_when_a_first_position_after_1() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+
+		assertEquals(2, list.indexOf("a", 1));
+	}
+
+	@Test
+	public void return_index_0_when_a_first_position_after_0() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+
+		assertEquals(0, list.indexOf("a", 0));
+	}
+
+	@Test
+	public void return_index_2_when_a_first_position_after_2() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+
+		assertEquals(2, list.indexOf("a", 2));
+	}
+
+	@Test
+	public void return_index_2_when_first_position_asked_is_null() {
+		ArrayList list = new ArrayList();
+
+		list.add(null);
+		list.add(null);
+		list.add("b");
+		list.add("a");
+
+		assertEquals(1, list.indexOf(null, 1));
+	}
+
+	@Test
+	public void return_index_minus_1_when_does_not_found_after_first_position() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+		list.add("b");
+		list.add("b");
+
+		assertEquals(-1, list.indexOf("a", 1));
+	}
+
+	@Test
+	public void return_index_3_when_first_position_asked_is_null() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add(null);
+		list.add("b");
+		list.add("a");
+
+		assertEquals(3, list.indexOf("a", 1));
+	}
+
+	@Test
+	public void return_index_2_when_b_third_position_after_first_position() {
+		ArrayList list = new ArrayList();
+
+		list.add("b");
+		list.add("a");
+		list.add("b");
+		list.add("a");
+
+		assertEquals(2, list.indexOf(new String(new char[] { 'b' }), 1));
+	}
+
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void throw_exception_when_index_equal_size() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+
+		list.indexOf("a", list.size());
+	}
+
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void throw_exception_when_index_greater_than_size() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+
+		list.indexOf("a", list.size() + 1);
+	}
+
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void throw_exception_when_index_lower_than_0() {
+		ArrayList list = new ArrayList();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+		
+		list.indexOf("a", -1);
 	}
 
 	// Lastindexof tests
@@ -342,25 +460,25 @@ public class ArrayListTest {
 		assertEquals("b", list.get(1));
 		assertEquals("c", list.get(2));
 	}
-	
+
 	@Test
 	public void when_adds_10_million_and_insert_into_position_0() {
 		ArrayList list = new ArrayList(5);
 		for (int i = 0; i < 10_000_000; i++)
 			list.add(String.valueOf(i));
 		list.insert(0, "a");
-		
+
 		assertEquals("a", list.get(0));
 		assertEquals("9999999", list.get(10_000_000));
-	}	
-	
+	}
+
 	@Test
 	public void when_insert_1_000_at_beginning() {
 		ArrayList list = new ArrayList(5);
 		for (int i = 0; i < 1_000; i++)
 			list.insert(0, String.valueOf(i));
-		
+
 		assertEquals("999", list.get(0));
 		assertEquals("0", list.get(999));
-	}	
+	}
 }

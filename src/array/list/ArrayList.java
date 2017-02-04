@@ -45,10 +45,10 @@ public class ArrayList {
 	public void insert(int index, String value) {
 		if (index < 0 || index > size)
 			throw new ArrayIndexOutOfBoundsException(index);
-		
+
 		size++;
 		checkSpace();
-		
+
 		if (index < size - 1)
 			System.arraycopy(array, index, array, index + 1, size);
 		array[index] = value;
@@ -104,19 +104,23 @@ public class ArrayList {
 		return array[index];
 	}
 
-	public int indexOf(String value) { // [a,a,a,a,a,a] deve retornar 0
-		for (int i = 0; i < size; i++) {
+	public int indexOf(String value) {
+		return indexOf(value, 0);
+	}
+
+	// a b c d e a b c d e
+	// indeof (b) retorna 1
+	//
+
+	public int indexOf(String value, int position) {
+		if (0 > position || position >= size)
+			throw new ArrayIndexOutOfBoundsException(position);
+		for (int i = position; i < size; i++) {
 			int index = compare(value, i);
 			if (index != -1)
 				return index;
-
 		}
 		return -1;
-		// hipotestes
-		// 1) Array[i] == null e value != null
-		// 2) Array[i] != null e value != null
-		// 3) Array[i] == null e value == null
-		// 4) Array[i] != null e value == null
 	}
 
 	public int lastIndexOf(String value) { // [a,a,a,a,a,a] deve retornar 5
@@ -155,15 +159,15 @@ public class ArrayList {
 	// OK - ler alguma posicao
 	// OK - retornar o primeiro indice de um valor na lista
 	// OK - retornar o ultimo indice de um valor na lista
-	// OK - adicionar em qualquer posição
-	
+	// OK - adicionar em qualquer posiï¿½ï¿½o
+
 	// retornar o primeiro indice de um valor na lista a partir de um indice
-	
+
 	// adicionar mais de um elemento no final
 	// adicionar mais de um elemento em qualquer posicao
 	// retirar de uma posicao
 	// Habilitar foreach
-	
+
 	// ordenar a lista maior > menor
 	// ordenar a lista menor > maior
 	// procurar valor na lista
