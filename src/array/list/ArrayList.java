@@ -1,75 +1,62 @@
 package array.list;
 
-import java.util.Arrays;
-
-public class ArrayList {
-	// constant
-
+@SuppressWarnings("unchecked")
+public class ArrayList<T> implements List<T> {
 	// fieds
-
-	private String[] array;
+	private Object[] array;
 	private int size = 0;
 
 	// constructor
 	public ArrayList() {
 		this(16);
-
 	}
 
 	public ArrayList(int initialSize) {
-		array = new String[initialSize];
+		array = new Object[initialSize];
 	}
 
 	@Override
 	public String toString() {
 		if (size == 0)
 			return "[]";
-		String s = "";
-		String comma = "[";
-		for (int i = 0; i < size; i++) {
-			s += comma + array[i];
-			comma = ", ";
-		}
-		return s + "]";
+
+		final StringBuilder builder = new StringBuilder("[").append(array[0]);
+		for (int i = 1; i < size; i++)
+			builder.append(',').append(' ').append(array[i]);
+
+		return builder.append(']').toString();
 	}
 
 	// methods
-	public void add(String s) {
-		checkSpace();
+	public void add(T s) {
+		checkSpace(1);
 		array[size++] = s;
 		// equal to
 		// array[size] = s;
 		// size++;
 	}
 
-	public void insert(int index, String value) {
-		if (index < 0 || index > size)
-			throw new ArrayIndexOutOfBoundsException(index);
-
-		size++;
-		checkSpace();
-
-		if (index < size - 1)
-			System.arraycopy(array, index, array, index + 1, size);
-		array[index] = value;
+	public void insert(int index, T value) {
+		insertAll(index, value);
 	}
 
 	public int size() {
 		return size;
 	}
 
-	private void checkSpace() {
-		if (hasSpace())
+	private void checkSpace(int space) {
+		if (hasSpace(space))
 			return;
-		increaseSpace();
+
+		increaseSpace(space);
 	}
 
-	private boolean hasSpace() {
-		return size < array.length;
+	private boolean hasSpace(int space) {
+		return size + space < array.length;
 	}
 
-	private void increaseSpace() {
-		String[] newArray = new String[(array.length + 1) * 2];
+	private void increaseSpace(int space) {
+		Object[] newArray = new Object[((array.length + 1) * 2) + space];
 
 		// for (int i = 0; i < array.length; i++) {
 		// newArray[i] = array[i];
@@ -81,15 +68,15 @@ public class ArrayList {
 	}
 
 	public void clear() {
-		array = new String[16];
+		array = new Object[16];
 		size = 0;
 	}
 
-	public String set(int index, String value) {
+	public T set(int index, T value) {
 		if (index < 0 || index >= size)
 			throw new ArrayIndexOutOfBoundsException(index);
 
-		String oldValue = array[index];
+		T oldValue = (T) array[index];
 		array[index] = value;
 		return oldValue;
 	}
@@ -98,13 +85,13 @@ public class ArrayList {
 		return size == 0;
 	}
 
-	public String get(int index) {
+	public T get(int index) {
 		if (index < 0 || index >= size)
 			throw new ArrayIndexOutOfBoundsException(index);
-		return array[index];
+		return (T) array[index];
 	}
 
-	public int indexOf(String value) {
+	public int indexOf(T value) {
 		return indexOf(value, 0);
 	}
 
@@ -112,7 +99,7 @@ public class ArrayList {
 	// indeof (b) retorna 1
 	//
 
-	public int indexOf(String value, int position) {
+	public int indexOf(T value, int position) {
 		if (0 > position || position >= size)
 			throw new ArrayIndexOutOfBoundsException(position);
 		for (int i = position; i < size; i++) {
@@ -123,7 +110,7 @@ public class ArrayList {
 		return -1;
 	}
 
-	public int lastIndexOf(String value) { // [a,a,a,a,a,a] deve retornar 5
+	public int lastIndexOf(T value) { // [a,a,a,a,a,a] deve retornar 5
 		for (int i = size - 1; i >= 0; i--) {
 			int index = compare(value, i);
 			if (index != -1)
@@ -132,7 +119,7 @@ public class ArrayList {
 		return -1;
 	}
 
-	private int compare(String value, int i) {
+	private int compare(T value, int i) {
 		if (array[i] == value)
 			return i;
 
@@ -144,8 +131,56 @@ public class ArrayList {
 		return -1;
 	}
 
-	public boolean contains(String value) {
+	public boolean contains(T value) {
 		return indexOf(value) != -1;
+	}
+
+	public void addAll(T... array) {
+		if (array == null || array.length == 0)
+			return;
+
+		final int length = array.length;
+
+		checkSpace(length);
+		System.arraycopy(array, 0, this.array, size, length);
+		size += length;
+	}
+
+	public void insertAll(int index, T... array) {
+		validateIndex(index);
+
+		if (array == null || array.length == 0)
+			return;
+
+		if (index == size) {
+			addAll(array);
+			return;
+		}
+
+		final int length = array.length;
+
+		checkSpace(length);
+
+		System.arraycopy(this.array, index, this.array, index + length, size - index);
+		System.arraycopy(array, 0, this.array, index, length);
+
+		size += length;
+	}
+
+	public T remove(final int index) {
+		validateIndex(index);
+
+		final T value = (T) array[index];
+
+		System.arraycopy(array, index + 1, array, index, size - index);
+		array[--size] = null;
+
+		return value;
+	}
+
+	private void validateIndex(int index) {
+		if (index < 0 || index > size)
+			throw new ArrayIndexOutOfBoundsException(index);
 	}
 
 	// como criar a lista
@@ -160,16 +195,15 @@ public class ArrayList {
 	// OK - retornar o primeiro indice de um valor na lista
 	// OK - retornar o ultimo indice de um valor na lista
 	// OK - adicionar em qualquer posi��o
+	// OK - retornar o primeiro indice de um valor na lista a partir de um
+	// indice
+	// OK - adicionar vários elementos no final
+	// OK - adicionar mais de um elemento em qualquer posicao
+	// OK - retirar de uma posicao
 
-	// retornar o primeiro indice de um valor na lista a partir de um indice
-
-	// adicionar mais de um elemento no final
-	// adicionar mais de um elemento em qualquer posicao
-	// retirar de uma posicao
 	// Habilitar foreach
 
 	// ordenar a lista maior > menor
 	// ordenar a lista menor > maior
 	// procurar valor na lista
-	//
 }
