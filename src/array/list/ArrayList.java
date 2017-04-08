@@ -1,12 +1,21 @@
 package array.list;
 
+import static java.lang.System.arraycopy;
+
 @SuppressWarnings("unchecked")
 public class ArrayList<T> implements List<T> {
-	// fieds
 	private Object[] array;
 	private int size = 0;
 
-	// constructor
+	public static <E> ArrayList<E> of(E... array) {
+		if (array == null || array.length == 0)
+			return new ArrayList<>(0);
+
+		ArrayList<E> list = new ArrayList<>(array.length);
+		list.addAll(array);
+		return list;
+	}
+
 	public ArrayList() {
 		this(16);
 	}
@@ -139,8 +148,18 @@ public class ArrayList<T> implements List<T> {
 		if (array == null || array.length == 0)
 			return;
 
-		final int length = array.length;
+		addAll(array.length, array);
+	}
 
+	public void addAll(List<T> list) {
+		if (list == null || list.isEmpty())
+			return;
+
+		ArrayList<T> l = (ArrayList<T>) list;
+		addAll(l.size, l.array);
+	}
+
+	private void addAll(final int length, Object[] array) {
 		checkSpace(length);
 		System.arraycopy(array, 0, this.array, size, length);
 		size += length;
@@ -152,17 +171,29 @@ public class ArrayList<T> implements List<T> {
 		if (array == null || array.length == 0)
 			return;
 
+		insertAll(index, array.length, array);
+	}
+
+	public void insertAll(int index, List<T> list) {
+		validateIndex(index);
+
+		if (list == null || list.isEmpty())
+			return;
+
+		ArrayList<T> l = (ArrayList<T>) list;
+		insertAll(index, l.size, l.array);
+	}
+
+	private void insertAll(final int index, final int length, Object[] array) {
 		if (index == size) {
-			addAll(array);
+			addAll(length, array);
 			return;
 		}
 
-		final int length = array.length;
-
 		checkSpace(length);
 
-		System.arraycopy(this.array, index, this.array, index + length, size - index);
-		System.arraycopy(array, 0, this.array, index, length);
+		arraycopy(this.array, index, this.array, index + length, size - index);
+		arraycopy(array, 0, this.array, index, length);
 
 		size += length;
 	}
@@ -172,7 +203,7 @@ public class ArrayList<T> implements List<T> {
 
 		final T value = (T) array[index];
 
-		System.arraycopy(array, index + 1, array, index, size - index);
+		arraycopy(array, index + 1, array, index, size - index);
 		array[--size] = null;
 
 		return value;

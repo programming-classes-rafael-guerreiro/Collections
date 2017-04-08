@@ -1,5 +1,6 @@
 package array.list;
 
+import static array.list.ArrayList.of;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -11,7 +12,6 @@ public class ArrayListTest {
 	@Test
 	public void toString_returns_empty_brackets_for_empty_list() {
 		assertEquals("[]", new ArrayList<String>(5).toString());
-
 	}
 
 	@Test
@@ -19,7 +19,6 @@ public class ArrayListTest {
 		ArrayList<String> list = new ArrayList<>(5);
 		list.add("a");
 		assertEquals("[a]", list.toString());
-
 	}
 
 	@Test
@@ -99,7 +98,7 @@ public class ArrayListTest {
 		list.add("a");
 		list.add("b");
 		list.add("c");
-
+		
 		assertEquals("b", list.set(1, "test"));
 		assertEquals("[a, test, c]", list.toString());
 	}
@@ -725,5 +724,132 @@ public class ArrayListTest {
 	@Test(expected = ArrayIndexOutOfBoundsException.class)
 	public void remove_should_validate_out_of_bounds_when_index_is_greater_than_size() {
 		new ArrayList<String>().remove(1);
+	}
+
+	@Test
+	public void addAll_with_another_array_list() {
+		ArrayList<String> list1 = new ArrayList<>();
+		list1.addAll("a", "b", "c");
+
+		ArrayList<String> list2 = new ArrayList<>();
+		list2.addAll("x", "y", "z");
+
+		list1.addAll(list2);
+
+		assertEquals(6, list1.size());
+		assertEquals("x", list1.get(3));
+		assertEquals("y", list1.get(4));
+		assertEquals("z", list1.get(5));
+	}
+
+	@Test
+	public void addAll_with_another_null_array_list_should_add_nothing() {
+		ArrayList<String> list1 = new ArrayList<>();
+		list1.addAll("a", "b", "c");
+
+		ArrayList<String> list2 = null;
+		list1.addAll(list2);
+
+		assertEquals(3, list1.size());
+	}
+
+	@Test
+	public void addAll_with_another_empty_array_list_should_add_nothing() {
+		ArrayList<String> list1 = new ArrayList<>();
+		list1.addAll("a", "b", "c");
+
+		ArrayList<String> list2 = new ArrayList<>();
+		list1.addAll(list2);
+
+		assertEquals(3, list1.size());
+	}
+
+	@Test
+	public void insertAll_with_arrayList_should_move_2_elements_when_size_is_5_and_index_is_3() {
+		ArrayList<String> list = new ArrayList<>(5);
+		list.addAll("0", "1", "2", "3", "4");
+
+		list.insertAll(3, of("a", "b"));
+
+		assertEquals(7, list.size());
+		assertEquals("0", list.get(0));
+		assertEquals("1", list.get(1));
+		assertEquals("2", list.get(2));
+		assertEquals("a", list.get(3));
+		assertEquals("b", list.get(4));
+		assertEquals("3", list.get(5));
+		assertEquals("4", list.get(6));
+	}
+
+	@Test
+	public void insertAll_with_arrayList_should_move_5_elements_when_size_is_5_and_index_is_0() {
+		ArrayList<String> list = new ArrayList<>(5);
+		list.addAll("0", "1", "2", "3", "4");
+
+		list.insertAll(0, of("a", "b"));
+
+		assertEquals(7, list.size());
+		assertEquals("a", list.get(0));
+		assertEquals("b", list.get(1));
+		assertEquals("0", list.get(2));
+		assertEquals("1", list.get(3));
+		assertEquals("2", list.get(4));
+		assertEquals("3", list.get(5));
+		assertEquals("4", list.get(6));
+	}
+
+	@Test
+	public void insertAll_with_arrayList_should_call_addAll_when_index_is_equal_size() {
+		ArrayList<String> list = new ArrayList<>();
+		list.addAll("0", "1", "2", "3", "4");
+
+		list.insertAll(5, of("a", "b"));
+
+		assertEquals(7, list.size());
+		assertEquals("0", list.get(0));
+		assertEquals("1", list.get(1));
+		assertEquals("2", list.get(2));
+		assertEquals("3", list.get(3));
+		assertEquals("4", list.get(4));
+		assertEquals("a", list.get(5));
+		assertEquals("b", list.get(6));
+	}
+
+	@Test
+	public void insertAll_with_arrayList_should_call_addAll_when_list_is_empty_and_index_is_0() {
+		ArrayList<String> list = new ArrayList<>();
+		list.insertAll(0, of("a", "b"));
+
+		assertEquals(2, list.size());
+		assertEquals("a", list.get(0));
+		assertEquals("b", list.get(1));
+	}
+
+	@Test
+	public void insertAll_with_arrayList_should_do_nothing_when_array_is_null() {
+		ArrayList<String> list = new ArrayList<>();
+		list.insertAll(0, (ArrayList<String>) null);
+
+		assertEquals(0, list.size());
+	}
+
+	@Test
+	public void insertAll_with_arrayList_should_do_nothing_when_array_is_null_and_list_has_elements() {
+		ArrayList<String> list = new ArrayList<>();
+		list.add("a");
+
+		list.insertAll(0, (ArrayList<String>) null);
+
+		assertEquals(1, list.size());
+	}
+
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void insertAll_with_arrayList_should_validate_out_of_bounds_when_index_is_lower_than_0() {
+		new ArrayList<String>().insertAll(-1, of("a"));
+	}
+
+	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	public void insertAll_with_arrayList_should_validate_out_of_bounds_when_index_is_greater_than_size() {
+		new ArrayList<Integer>().insertAll(1, of(2));
 	}
 }

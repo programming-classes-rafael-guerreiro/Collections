@@ -26,11 +26,11 @@ public interface List<E> {
 
 	void addAll(E... array);
 
-	// void addAll(ArrayList<T> list);
+	void addAll(List<E> list);
 
 	void insertAll(int index, E... array);
 
-	// void insertAll(int index, ArrayList<T> list);
+	void insertAll(int index, List<E> list);
 
 	E remove(final int index);
 }
