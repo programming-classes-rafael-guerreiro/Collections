@@ -155,8 +155,15 @@ public class ArrayList<T> implements List<T> {
 		if (list == null || list.isEmpty())
 			return;
 
-		ArrayList<T> l = (ArrayList<T>) list;
-		addAll(l.size, l.array);
+		if (list instanceof ArrayList) {
+			ArrayList<T> l = (ArrayList<T>) list;
+			addAll(l.size, l.array);
+			return;
+		}
+
+		checkSpace(list.size());
+		for (int index = 0; index < list.size(); index++)
+			add(list.get(index));
 	}
 
 	private void addAll(final int length, Object[] array) {
@@ -180,8 +187,15 @@ public class ArrayList<T> implements List<T> {
 		if (list == null || list.isEmpty())
 			return;
 
-		ArrayList<T> l = (ArrayList<T>) list;
-		insertAll(index, l.size, l.array);
+		if (list instanceof ArrayList) {
+			ArrayList<T> l = (ArrayList<T>) list;
+			insertAll(index, l.size, l.array);
+			return;
+		}
+
+		checkSpace(list.size());
+		for (int ix = 0; ix < list.size(); ix++)
+			insert(index + ix, list.get(ix));
 	}
 
 	private void insertAll(final int index, final int length, Object[] array) {

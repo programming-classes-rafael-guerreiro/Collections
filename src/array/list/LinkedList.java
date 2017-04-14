@@ -6,6 +6,15 @@ public class LinkedList<T> implements List<T> {
 
 	private int size = 0;
 
+	public static <E> LinkedList<E> of(E... array) {
+		if (array == null || array.length == 0)
+			return new LinkedList<>();
+
+		LinkedList<E> list = new LinkedList<>();
+		list.addAll(array);
+		return list;
+	}
+
 	@Override
 	public void add(T s) {
 		final Element<T> element = new Element<>(s);
@@ -21,8 +30,42 @@ public class LinkedList<T> implements List<T> {
 
 	@Override
 	public void insert(int index, T value) {
-		// TODO Auto-generated method stub
+		validateIndex(index);
 
+		if (index == 0) {
+			insertFirst(value);
+			return;
+		}
+
+		if (index == size) {
+			insertLast(value);
+			return;
+		}
+
+		final Element<T> previous = getElement(index - 1);
+		final Element<T> current = new Element<>(value, previous.getNext());
+		previous.setNext(current);
+		size++;
+	}
+
+	public void insertFirst(T value) {
+		if (isEmpty()) {
+			add(value);
+			return;
+		}
+
+		final Element<T> element = new Element<T>(value, head);
+		head = element;
+		size++;
+	}
+
+	public void insertLast(T value) {
+		add(value);
+	}
+
+	private void validateIndex(int index) {
+		if (index < 0 || index > size)
+			throwIndexOutOfBounds(index);
 	}
 
 	@Override
@@ -44,7 +87,7 @@ public class LinkedList<T> implements List<T> {
 
 	private Element<T> getElement(int index) {
 		if (index < 0 || index >= size)
-			throw new ArrayIndexOutOfBoundsException(index);
+			throwIndexOutOfBounds(index);
 
 		if (index == 0)
 			return head;
@@ -57,6 +100,10 @@ public class LinkedList<T> implements List<T> {
 			element = element.getNext();
 
 		return element;
+	}
+
+	private void throwIndexOutOfBounds(int index) {
+		throw new IndexOutOfBoundsException("index out of range: " + index);
 	}
 
 	@Override
@@ -85,14 +132,36 @@ public class LinkedList<T> implements List<T> {
 
 	@Override
 	public int indexOf(T value) {
-		// TODO Auto-generated method stub
-		return 0;
+		return indexOf(value, 0);
 	}
 
 	@Override
 	public int indexOf(T value, int position) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (position < 0 || position >= size)
+			throwIndexOutOfBounds(position);
+
+		if (isEmpty())
+			return -1;
+
+		Element<T> element = head;
+		for (int index = 0; index < size; index++) {
+			if (index >= position && compareValue(element.getValue(), value))
+				return index;
+
+			element = element.getNext();
+		}
+
+		return -1;
+	}
+
+	private boolean compareValue(T v1, T v2) {
+		if (v1 == v2)
+			return true;
+
+		if (v1 == null)
+			return false;
+
+		return v1.equals(v2);
 	}
 
 	@Override
@@ -103,20 +172,50 @@ public class LinkedList<T> implements List<T> {
 
 	@Override
 	public boolean contains(T value) {
-		// TODO Auto-generated method stub
-		return false;
+		return indexOf(value) != -1;
 	}
 
 	@Override
 	public void addAll(T... array) {
-		// TODO Auto-generated method stub
+		if (array == null || array.length == 0) // guard clause
+			return;
 
+		add(array[0]);
+
+		Element<T> current = tail;
+		for (int index = 1; index < array.length; index++) {
+			Element<T> element = new Element<>(array[index]);
+			current.setNext(element);
+			current = element;
+		}
+
+		tail = current;
+		size += array.length - 1;
 	}
 
 	@Override
 	public void addAll(List<T> list) {
-		// TODO Auto-generated method stub
+		if (list == null || list.isEmpty())
+			return;
 
+		if (list instanceof LinkedList) {
+			LinkedList<T> linked = (LinkedList<T>) list;
+
+			try {
+				tail.setNext(linked.head.clone());
+
+				while (tail.getNext() != null)
+					tail = tail.getNext();
+
+				size += linked.size();
+			} catch (CloneNotSupportedException e) {
+			}
+
+			return;
+		}
+
+		for (int index = 0; index < list.size(); index++)
+			add(list.get(index));
 	}
 
 	@Override
@@ -138,7 +237,7 @@ public class LinkedList<T> implements List<T> {
 	}
 
 	// inner-class
-	private static class Element<E> {
+	private static class Element<E> implements Cloneable {
 		private E value;
 		private Element<E> next;
 
@@ -149,6 +248,15 @@ public class LinkedList<T> implements List<T> {
 		public Element(E value, Element<E> next) {
 			this.value = value;
 			this.next = next;
+		}
+
+		@Override
+		// TODO keep talking about memory reference.
+		protected Element<E> clone() throws CloneNotSupportedException {
+			if (next == null)
+				return new Element<>(value);
+
+			return new Element<E>(value, next.clone());
 		}
 
 		public E getValue() {
