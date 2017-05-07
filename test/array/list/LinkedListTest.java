@@ -553,12 +553,12 @@ public class LinkedListTest {
 		assertEquals(1, list.size());
 	}
 
-	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	@Test(expected = IndexOutOfBoundsException.class)
 	public void insertAll_with_arrayList_should_validate_out_of_bounds_when_index_is_lower_than_0() {
 		new LinkedList<String>().insertAll(-1, of("a"));
 	}
 
-	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	@Test(expected = IndexOutOfBoundsException.class)
 	public void insertAll_with_arrayList_should_validate_out_of_bounds_when_index_is_greater_than_size() {
 		new LinkedList<Integer>().insertAll(1, of(2));
 	}
@@ -587,9 +587,9 @@ public class LinkedListTest {
 		LinkedList<String> list2 = new LinkedList<>();
 		list2.addAll("x", "y", "z");
 
-		list1.addAll(list2);
+		list1.addAll(list2); // [a, b, c, x, y, z]
 
-		list2.set(1, "Rafael");
+		list2.set(1, "Rafael"); // [x, Rafael, z]
 
 		assertEquals(6, list1.size());
 		assertEquals("x", list1.get(3));
@@ -637,6 +637,40 @@ public class LinkedListTest {
 	}
 
 	@Test
+	public void insertAll_with_linked_list_should_add_items_in_the_middle() {
+		LinkedList<String> list = new LinkedList<>();
+		list.addAll("0", "1", "2", "3", "4");
+
+		list.insertAll(3, LinkedList.of("a", "b"));
+
+		assertEquals(7, list.size());
+		assertEquals("0", list.get(0));
+		assertEquals("1", list.get(1));
+		assertEquals("2", list.get(2));
+		assertEquals("a", list.get(3));
+		assertEquals("b", list.get(4));
+		assertEquals("3", list.get(5));
+		assertEquals("4", list.get(6));
+	}
+
+	@Test
+	public void insertAll_with_linked_list_should_add_items_in_the_beginning() {
+		LinkedList<String> list = new LinkedList<>();
+		list.addAll("0", "1", "2", "3", "4");
+
+		list.insertAll(0, LinkedList.of("a", "b"));
+
+		assertEquals(7, list.size());
+		assertEquals("a", list.get(0));
+		assertEquals("b", list.get(1));
+		assertEquals("0", list.get(2));
+		assertEquals("1", list.get(3));
+		assertEquals("2", list.get(4));
+		assertEquals("3", list.get(5));
+		assertEquals("4", list.get(6));
+	}
+
+	@Test
 	public void insertAll_with_linked_list_should_call_addAll_when_list_is_empty_and_index_is_0() {
 		LinkedList<String> list = new LinkedList<>();
 		list.insertAll(0, LinkedList.of("a", "b"));
@@ -664,13 +698,102 @@ public class LinkedListTest {
 		assertEquals(1, list.size());
 	}
 
-	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	@Test(expected = IndexOutOfBoundsException.class)
 	public void insertAll_with_linked_list_should_validate_out_of_bounds_when_index_is_lower_than_0() {
 		new LinkedList<String>().insertAll(-1, LinkedList.of("a"));
 	}
 
-	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	@Test(expected = IndexOutOfBoundsException.class)
 	public void insertAll_with_linked_list_should_validate_out_of_bounds_when_index_is_greater_than_size() {
 		new LinkedList<Integer>().insertAll(1, LinkedList.of(2));
+	}
+
+	@Test
+	public void insertAll_with_varargs_should_call_addAll_when_index_is_equal_size() {
+		LinkedList<String> list = new LinkedList<>();
+		list.addAll("0", "1", "2", "3", "4");
+
+		list.insertAll(5, "a", "b");
+
+		assertEquals(7, list.size());
+		assertEquals("0", list.get(0));
+		assertEquals("1", list.get(1));
+		assertEquals("2", list.get(2));
+		assertEquals("3", list.get(3));
+		assertEquals("4", list.get(4));
+		assertEquals("a", list.get(5));
+		assertEquals("b", list.get(6));
+	}
+
+	@Test
+	public void insertAll_with_varargs_should_add_items_in_the_middle() {
+		LinkedList<String> list = new LinkedList<>();
+		list.addAll("0", "1", "2", "3", "4");
+
+		list.insertAll(3, "a", "b");
+
+		assertEquals(7, list.size());
+		assertEquals("0", list.get(0));
+		assertEquals("1", list.get(1));
+		assertEquals("2", list.get(2));
+		assertEquals("a", list.get(3));
+		assertEquals("b", list.get(4));
+		assertEquals("3", list.get(5));
+		assertEquals("4", list.get(6));
+	}
+
+	@Test
+	public void insertAll_with_varargs_should_add_items_in_the_beginning() {
+		LinkedList<String> list = new LinkedList<>();
+		list.addAll("0", "1", "2", "3", "4");
+
+		list.insertAll(0, "a", "b");
+
+		assertEquals(7, list.size());
+		assertEquals("a", list.get(0));
+		assertEquals("b", list.get(1));
+		assertEquals("0", list.get(2));
+		assertEquals("1", list.get(3));
+		assertEquals("2", list.get(4));
+		assertEquals("3", list.get(5));
+		assertEquals("4", list.get(6));
+	}
+
+	@Test
+	public void insertAll_with_varargs_should_call_addAll_when_list_is_empty_and_index_is_0() {
+		LinkedList<String> list = new LinkedList<>();
+		list.insertAll(0, "a", "b");
+
+		assertEquals(2, list.size());
+		assertEquals("a", list.get(0));
+		assertEquals("b", list.get(1));
+	}
+
+	@Test
+	public void insertAll_with_varargs_should_do_nothing_when_array_is_null() {
+		LinkedList<String> list = new LinkedList<>();
+		list.insertAll(0, (String[]) null);
+
+		assertEquals(0, list.size());
+	}
+
+	@Test
+	public void insertAll_with_varargs_should_do_nothing_when_array_is_null_and_list_has_elements() {
+		LinkedList<String> list = new LinkedList<>();
+		list.add("a");
+
+		list.insertAll(0, (String[]) null);
+
+		assertEquals(1, list.size());
+	}
+
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void insertAll_with_varargs_should_validate_out_of_bounds_when_index_is_lower_than_0() {
+		new LinkedList<String>().insertAll(-1, "a");
+	}
+
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void insertAll_with_varargs_should_validate_out_of_bounds_when_index_is_greater_than_size() {
+		new LinkedList<Integer>().insertAll(1, 2);
 	}
 }

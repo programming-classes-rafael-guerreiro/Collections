@@ -1,7 +1,7 @@
 package array.list;
 
 @SuppressWarnings("unchecked")
-public interface List<E> {
+public interface List<E> extends Iterable<E> {
 	void add(E s);
 
 	void insert(int index, E value);

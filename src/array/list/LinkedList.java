@@ -1,8 +1,12 @@
 package array.list;
 
+import static array.list.ArrayList.asList;
+
+import java.util.Iterator;
+
 public class LinkedList<T> implements List<T> {
-	private Element<T> head;
-	private Element<T> tail;
+	private Node<T> head;
+	private Node<T> tail;
 
 	private int size = 0;
 
@@ -17,7 +21,7 @@ public class LinkedList<T> implements List<T> {
 
 	@Override
 	public void add(T s) {
-		final Element<T> element = new Element<>(s);
+		final Node<T> element = new Node<>(s);
 
 		if (isEmpty())
 			head = element;
@@ -42,8 +46,8 @@ public class LinkedList<T> implements List<T> {
 			return;
 		}
 
-		final Element<T> previous = getElement(index - 1);
-		final Element<T> current = new Element<>(value, previous.getNext());
+		final Node<T> previous = getElement(index - 1);
+		final Node<T> current = new Node<>(value, previous.getNext());
 		previous.setNext(current);
 		size++;
 	}
@@ -54,7 +58,7 @@ public class LinkedList<T> implements List<T> {
 			return;
 		}
 
-		final Element<T> element = new Element<T>(value, head);
+		final Node<T> element = new Node<T>(value, head);
 		head = element;
 		size++;
 	}
@@ -85,7 +89,7 @@ public class LinkedList<T> implements List<T> {
 		return getElement(index).setValue(value);
 	}
 
-	private Element<T> getElement(int index) {
+	private Node<T> getElement(int index) {
 		if (index < 0 || index >= size)
 			throwIndexOutOfBounds(index);
 
@@ -95,7 +99,7 @@ public class LinkedList<T> implements List<T> {
 		if (index == size - 1)
 			return tail;
 
-		Element<T> element = head;
+		Node<T> element = head;
 		for (int count = 0; count < index; count++)
 			element = element.getNext();
 
@@ -143,7 +147,7 @@ public class LinkedList<T> implements List<T> {
 		if (isEmpty())
 			return -1;
 
-		Element<T> element = head;
+		Node<T> element = head;
 		for (int index = 0; index < size; index++) {
 			if (index >= position && compareValue(element.getValue(), value))
 				return index;
@@ -180,17 +184,7 @@ public class LinkedList<T> implements List<T> {
 		if (array == null || array.length == 0) // guard clause
 			return;
 
-		add(array[0]);
-
-		Element<T> current = tail;
-		for (int index = 1; index < array.length; index++) {
-			Element<T> element = new Element<>(array[index]);
-			current.setNext(element);
-			current = element;
-		}
-
-		tail = current;
-		size += array.length - 1;
+		addAll(asList(array));
 	}
 
 	@Override
@@ -198,36 +192,53 @@ public class LinkedList<T> implements List<T> {
 		if (list == null || list.isEmpty())
 			return;
 
-		if (list instanceof LinkedList) {
-			LinkedList<T> linked = (LinkedList<T>) list;
-
-			try {
-				tail.setNext(linked.head.clone());
-
-				while (tail.getNext() != null)
-					tail = tail.getNext();
-
-				size += linked.size();
-			} catch (CloneNotSupportedException e) {
-			}
-
-			return;
-		}
-
-		for (int index = 0; index < list.size(); index++)
-			add(list.get(index));
+		for (T element : list)
+			add(element);
 	}
 
 	@Override
 	public void insertAll(int index, T... array) {
-		// TODO Auto-generated method stub
+		validateIndex(index);
+		if (array == null || array.length == 0)
+			return;
 
+		insertAll(index, asList(array));
 	}
 
 	@Override
 	public void insertAll(int index, List<T> list) {
-		// TODO Auto-generated method stub
+		validateIndex(index);
+		if (list == null || list.size() == 0)
+			return;
 
+		if (index == size) {
+			addAll(list);
+			return;
+		}
+
+		Node<T> current = null;
+		if (index > 0)
+			current = getElement(index - 1);
+
+		Node<T> first = null;
+		final Node<T> next = current == null ? head : current.getNext();
+		for (T e : list) {
+			Node<T> newElement = new Node<>(e);
+
+			if (current != null)
+				current.setNext(newElement);
+
+			current = newElement;
+			if (first == null)
+				first = current;
+		}
+
+		current.setNext(next);
+
+		if (index == 0)
+			head = first;
+
+		size += list.size();
 	}
 
 	@Override
@@ -236,27 +247,46 @@ public class LinkedList<T> implements List<T> {
 		return null;
 	}
 
-	// inner-class
-	private static class Element<E> implements Cloneable {
-		private E value;
-		private Element<E> next;
+	@Override
+	public Iterator<T> iterator() {
+		return new Iterator<T>() {
+			private Node<T> next = head;
 
-		public Element(E value) {
+			@Override
+			public boolean hasNext() {
+				return next != null;
+			}
+
+			@Override
+			public T next() {
+				T value = next.getValue();
+				next = next.getNext();
+				return value;
+			}
+		};
+	}
+
+	// inner-class
+	private static class Node<E> implements Cloneable {
+		private E value;
+		private Node<E> next;
+
+		public Node(E value) {
 			this(value, null);
 		}
 
-		public Element(E value, Element<E> next) {
+		public Node(E value, Node<E> next) {
 			this.value = value;
 			this.next = next;
 		}
 
 		@Override
 		// TODO keep talking about memory reference.
-		protected Element<E> clone() throws CloneNotSupportedException {
+		protected Node<E> clone() throws CloneNotSupportedException {
 			if (next == null)
-				return new Element<>(value);
+				return new Node<>(value);
 
-			return new Element<E>(value, next.clone());
+			return new Node<E>(value, next.clone());
 		}
 
 		public E getValue() {
@@ -269,11 +299,11 @@ public class LinkedList<T> implements List<T> {
 			return old;
 		}
 
-		public Element<E> getNext() {
+		public Node<E> getNext() {
 			return next;
 		}
 
-		public void setNext(Element<E> next) {
+		public void setNext(Node<E> next) {
 			this.next = next;
 		}
 

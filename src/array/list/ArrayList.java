@@ -2,10 +2,16 @@ package array.list;
 
 import static java.lang.System.arraycopy;
 
+import java.util.Iterator;
+
 @SuppressWarnings("unchecked")
 public class ArrayList<T> implements List<T> {
 	private Object[] array;
 	private int size = 0;
+
+	public static <E> ArrayList<E> asList(E... array) {
+		return new ArrayList<>(array);
+	}
 
 	public static <E> ArrayList<E> of(E... array) {
 		if (array == null || array.length == 0)
@@ -22,6 +28,11 @@ public class ArrayList<T> implements List<T> {
 
 	public ArrayList(int initialSize) {
 		array = new Object[initialSize];
+	}
+
+	private ArrayList(Object[] array) {
+		this.array = array;
+		size = array.length;
 	}
 
 	@Override
@@ -221,6 +232,23 @@ public class ArrayList<T> implements List<T> {
 		array[--size] = null;
 
 		return value;
+	}
+	
+	@Override
+	public Iterator<T> iterator() {
+		return new Iterator<T>() {
+			private int index = 0;
+
+			@Override
+			public boolean hasNext() {
+				return index < size;
+			}
+
+			@Override
+			public T next() {	
+				return get(index++);
+			}
+		};
 	}
 
 	private void validateIndex(int index) {
