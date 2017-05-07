@@ -1,8 +1,6 @@
 import static java.lang.Math.abs;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,43 +8,75 @@ import java.util.List;
 public class Application {
 
 	public static void main(String[] args) {
+		Pessoa rafael = new Pessoa("Rafael", 24);
 
-//		Pessoa rafael = new Pessoa("Rafael", 24);
-
+		Class<Pessoa> clazz = Pessoa.class;
 		try {
-			Constructor<Pessoa> constructor = Pessoa.class.getDeclaredConstructor(String.class, int.class);
-			constructor.setAccessible(true);
-			try {
-				Pessoa gabriel = constructor.newInstance("Gabriel", 35);
-				System.out.println(gabriel);
-			} catch (InstantiationException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException e) {
+			Field field = clazz.getDeclaredField("idade");
+			field.setAccessible(true); // private vira public. Final some
+			
+
+			Object value = field.get(rafael);
+			System.out.println("A idade é: " + value);
+			
+			field.set(rafael, 250);
+			
+			value = field.get(rafael);
+			
+			System.out.println("A idade é: " + value);
+		} catch (NoSuchFieldException | SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		
+		
+		
+
+		// try {
+		// Constructor<Pessoa> constructor =
+		// Pessoa.class.getDeclaredConstructor(String.class, int.class);
+		// constructor.setAccessible(true);
+		// try {
+		// Pessoa gabriel = constructor.newInstance("Gabriel", 35);
+		// System.out.println(gabriel);
+		// } catch (InstantiationException | InvocationTargetException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// } catch (SecurityException | IllegalArgumentException |
+		// IllegalAccessException | NoSuchMethodException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 
 	}
 
 	public static void main5(String[] args) {
-//		Pessoa rafael = new Pessoa("Aa", 24);
-//		Pessoa rafael2 = new Pessoa("BB", 24);
-//
-//		System.out.println(rafael.hashCode());
-//		System.out.println(rafael2.hashCode());
-//
-//		String a = new String(new char[] { 'a', 'b', 'c' });
-//		String b = "abc";
-//
-//		System.out.println(a + " -> memory: " + System.identityHashCode(a) + " -> hashCode: " + a.hashCode());
-//		System.out.println(b + " -> memory: " + System.identityHashCode(b) + " -> hashCode: " + b.hashCode());
-//
-//		System.out.println("Aa".hashCode() + "," + "BB".hashCode());
-//		System.out.println("Ba".hashCode() + "," + "CB".hashCode());
-//		System.out.println("Ca".hashCode() + "," + "DB".hashCode());
-//		System.out.println("Da".hashCode() + "," + "EB".hashCode());
+		// Pessoa rafael = new Pessoa("Aa", 24);
+		// Pessoa rafael2 = new Pessoa("BB", 24);
+		//
+		// System.out.println(rafael.hashCode());
+		// System.out.println(rafael2.hashCode());
+		//
+		// String a = new String(new char[] { 'a', 'b', 'c' });
+		// String b = "abc";
+		//
+		// System.out.println(a + " -> memory: " + System.identityHashCode(a) +
+		// " -> hashCode: " + a.hashCode());
+		// System.out.println(b + " -> memory: " + System.identityHashCode(b) +
+		// " -> hashCode: " + b.hashCode());
+		//
+		// System.out.println("Aa".hashCode() + "," + "BB".hashCode());
+		// System.out.println("Ba".hashCode() + "," + "CB".hashCode());
+		// System.out.println("Ca".hashCode() + "," + "DB".hashCode());
+		// System.out.println("Da".hashCode() + "," + "EB".hashCode());
 
 		// System.out.println(rafael.getNome() + " -> " +
 		// System.identityHashCode(rafael));
