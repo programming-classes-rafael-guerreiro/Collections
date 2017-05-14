@@ -796,4 +796,62 @@ public class LinkedListTest {
 	public void insertAll_with_varargs_should_validate_out_of_bounds_when_index_is_greater_than_size() {
 		new LinkedList<Integer>().insertAll(1, 2);
 	}
+
+	@Test
+	public void return_index_2_when_a_last_position() {
+		LinkedList<String> list = new LinkedList<>();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+
+		assertEquals(2, list.lastIndexOf("a"));
+	}
+
+	@Test
+	public void return_index_0_when_null_last_position() {
+		LinkedList<String> list = new LinkedList<>();
+
+		list.add(null);
+		list.add("a");
+		list.add("b");
+		list.add("a");
+
+		assertEquals(0, list.lastIndexOf(null));
+	}
+
+	@Test
+	public void return_index_minus_1_when_does_not_found_for_last_indexof() {
+		LinkedList<String> list = new LinkedList<>();
+
+		list.add("b");
+		list.add("b");
+		list.add("b");
+
+		assertEquals(-1, list.lastIndexOf("a"));
+	}
+
+	@Test
+	public void return_index_2_when_last_position_is_null() {
+		LinkedList<String> list = new LinkedList<>();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+		list.add(null);
+
+		assertEquals(2, list.lastIndexOf("a"));
+	}
+
+	@Test
+	public void return_index_1_when_b_second_position() {
+		LinkedList<String> list = new LinkedList<>();
+
+		list.add("a");
+		list.add("b");
+		list.add("a");
+		list.add(null);
+
+		assertEquals(1, list.lastIndexOf(new String(new char[] { 'b' })));
+	}
 }

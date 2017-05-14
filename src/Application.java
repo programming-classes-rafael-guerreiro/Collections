@@ -14,15 +14,14 @@ public class Application {
 		try {
 			Field field = clazz.getDeclaredField("idade");
 			field.setAccessible(true); // private vira public. Final some
-			
 
 			Object value = field.get(rafael);
 			System.out.println("A idade é: " + value);
-			
+
 			field.set(rafael, 250);
-			
+
 			value = field.get(rafael);
-			
+
 			System.out.println("A idade é: " + value);
 		} catch (NoSuchFieldException | SecurityException e) {
 			e.printStackTrace();

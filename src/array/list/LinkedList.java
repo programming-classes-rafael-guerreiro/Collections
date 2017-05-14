@@ -4,7 +4,9 @@ import static array.list.ArrayList.asList;
 
 import java.util.Iterator;
 
-public class LinkedList<T> implements List<T> {
+// Single linked list
+// Double linked list
+public class LinkedList<T> implements List<T>, Stack<T>, Queue<T> {
 	private Node<T> head;
 	private Node<T> tail;
 
@@ -25,8 +27,10 @@ public class LinkedList<T> implements List<T> {
 
 		if (isEmpty())
 			head = element;
-		else
+		else {
+			element.setPrevious(tail);
 			tail.setNext(element);
+		}
 
 		tail = element;
 		size++;
@@ -46,9 +50,12 @@ public class LinkedList<T> implements List<T> {
 			return;
 		}
 
-		final Node<T> previous = getElement(index - 1);
-		final Node<T> current = new Node<>(value, previous.getNext());
+		final Node<T> next = getElement(index);
+		final Node<T> previous = next.getPrevious();
+		final Node<T> current = new Node<>(previous, value, next);
+		next.setPrevious(current);
 		previous.setNext(current);
+
 		size++;
 	}
 
@@ -58,8 +65,10 @@ public class LinkedList<T> implements List<T> {
 			return;
 		}
 
-		final Node<T> element = new Node<T>(value, head);
+		final Node<T> element = new Node<T>(null, value, head);
+		head.setPrevious(element);
 		head = element;
+
 		size++;
 	}
 
@@ -90,8 +99,7 @@ public class LinkedList<T> implements List<T> {
 	}
 
 	private Node<T> getElement(int index) {
-		if (index < 0 || index >= size)
-			throwIndexOutOfBounds(index);
+		validateIndexInSize(index);
 
 		if (index == 0)
 			return head;
@@ -99,11 +107,31 @@ public class LinkedList<T> implements List<T> {
 		if (index == size - 1)
 			return tail;
 
+		if (index < (size >> 1))
+			return lookForward(index);
+
+		return lookBackwards(index);
+	}
+
+	private Node<T> lookForward(int index) {
 		Node<T> element = head;
 		for (int count = 0; count < index; count++)
 			element = element.getNext();
 
 		return element;
+	}
+
+	private Node<T> lookBackwards(int index) {
+		Node<T> element = tail;
+		for (int count = size - 1; count > index; count--)
+			element = element.getPrevious();
+
+		return element;
+	}
+
+	private void validateIndexInSize(int index) {
+		if (index < 0 || index >= size)
+			throwIndexOutOfBounds(index);
 	}
 
 	private void throwIndexOutOfBounds(int index) {
@@ -141,8 +169,7 @@ public class LinkedList<T> implements List<T> {
 
 	@Override
 	public int indexOf(T value, int position) {
-		if (position < 0 || position >= size)
-			throwIndexOutOfBounds(position);
+		validateIndexInSize(position);
 
 		if (isEmpty())
 			return -1;
@@ -170,8 +197,18 @@ public class LinkedList<T> implements List<T> {
 
 	@Override
 	public int lastIndexOf(T value) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (isEmpty())
+			return -1;
+
+		Node<T> element = tail;
+		for (int index = size - 1; index >= 0; index--) {
+			if (compareValue(element.getValue(), value))
+				return index;
+
+			element = element.getPrevious();
+		}
+
+		return -1;
 	}
 
 	@Override
@@ -216,14 +253,12 @@ public class LinkedList<T> implements List<T> {
 			return;
 		}
 
-		Node<T> current = null;
-		if (index > 0)
-			current = getElement(index - 1);
-
+		Node<T> last = getElement(index);
+		Node<T> current = last.getPrevious();
 		Node<T> first = null;
-		final Node<T> next = current == null ? head : current.getNext();
+
 		for (T e : list) {
-			Node<T> newElement = new Node<>(e);
+			Node<T> newElement = new Node<>(current, e, null);
 
 			if (current != null)
 				current.setNext(newElement);
@@ -233,7 +268,8 @@ public class LinkedList<T> implements List<T> {
 				first = current;
 		}
 
-		current.setNext(next);
+		current.setNext(last);
+		last.setPrevious(current);
 
 		if (index == 0)
 			head = first;
@@ -241,10 +277,78 @@ public class LinkedList<T> implements List<T> {
 		size += list.size();
 	}
 
+	private void validateState() {
+		if (isEmpty())
+			throw new IllegalStateException("The linked list is empty.");
+	}
+
+	public T removeFirst() {
+		validateState();
+
+		T old = head.getValue();
+		head = head.getNext();
+		head.setPrevious(null);
+
+		if (head == null)
+			tail = null;
+
+		size--;
+		return old;
+	}
+
 	@Override
 	public T remove(int index) {
-		// TODO Auto-generated method stub
-		return null;
+		validateIndexInSize(index);
+
+		if (index == 0)
+			return removeFirst();
+
+		Node<T> current = getElement(index);
+
+		Node<T> previous = current.getPrevious();
+		Node<T> next = current.getNext();
+
+		previous.setNext(next);
+		if (next == null)
+			tail = previous;
+		else
+			next.setPrevious(previous);
+
+		size--;
+		return current.getValue();
+	}
+
+	@Override
+	public void push(T value) {
+		add(value);
+	}
+
+	@Override
+	public T pop() {
+		validateState();
+		return remove(size - 1);
+	}
+
+	@Override
+	public T peek() {
+		validateState();
+		return tail.getValue();
+	}
+
+	@Override
+	public void enqueue(T value) {
+		add(value);
+	}
+
+	@Override
+	public T dequeue() {
+		return removeFirst();
+	}
+
+	@Override
+	public T poll() {
+		validateState();
+		return head.getValue();
 	}
 
 	@Override
@@ -268,25 +372,26 @@ public class LinkedList<T> implements List<T> {
 
 	// inner-class
 	private static class Node<E> implements Cloneable {
+		private Node<E> previous;
 		private E value;
 		private Node<E> next;
 
 		public Node(E value) {
-			this(value, null);
+			this(null, value, null);
 		}
 
-		public Node(E value, Node<E> next) {
+		public Node(Node<E> previous, E value, Node<E> next) {
+			this.previous = previous;
 			this.value = value;
 			this.next = next;
 		}
 
 		@Override
-		// TODO keep talking about memory reference.
 		protected Node<E> clone() throws CloneNotSupportedException {
-			if (next == null)
-				return new Node<>(value);
+			final Node<E> previous = this.previous == null ? null : this.previous.clone();
+			final Node<E> next = this.next == null ? null : this.next.clone();
 
-			return new Node<E>(value, next.clone());
+			return new Node<E>(previous, value, next);
 		}
 
 		public E getValue() {
@@ -309,6 +414,18 @@ public class LinkedList<T> implements List<T> {
 
 		public boolean hasNext() {
 			return next != null;
+		}
+
+		public Node<E> getPrevious() {
+			return previous;
+		}
+
+		public void setPrevious(Node<E> previous) {
+			this.previous = previous;
+		}
+
+		public boolean hasPrevious() {
+			return previous != null;
 		}
 	}
 }
